@@ -15,11 +15,14 @@ VPS 上で root として、これだけ：
 ```bash
 git clone https://github.com/momotaka/kks_forge.git /opt/kks-forge
 cd /opt/kks-forge
-make install                  # ← .env がエディタで開く → 順に全部走る
-make verify
+./install.sh                  # ← .env がエディタで開く → 順に全部走る
+./install.sh verify           # 動作確認
 ```
 
-`make install` の中身（順番に実行されます）:
+> `make` が入っていない VPS でも `./install.sh` だけで完結します。
+> `make` がある環境では `make install` と等価。個別ステップも `./install.sh env` など可。
+
+`install.sh` の中身（順番に実行されます）:
 
 1. `make env`      — `.env` を `.env.example` から作り、`$EDITOR` で開く。保存・終了で続行
 2. `make check`    — Node.js v22+ / docker / nginx / envsubst の前提確認

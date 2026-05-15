@@ -24,6 +24,15 @@ check_cmd() {
   fi
 }
 
+soft_check_cmd() {
+  local cmd="$1" hint="$2"
+  if command -v "$cmd" >/dev/null 2>&1; then
+    ok "$cmd: $(command -v "$cmd")"
+  else
+    warn "$cmd 任意: $hint"
+  fi
+}
+
 log "コマンド検査"
 check_cmd node    "nvm or apt で Node.js v22+ を入れてください"
 check_cmd npx     "Node.js に同梱されているはず"
@@ -33,6 +42,9 @@ check_cmd docker  "https://docs.docker.com/engine/install/ に従って導入"
 check_cmd envsubst "apt install gettext-base"
 check_cmd openssl "apt install openssl"
 check_cmd htpasswd "apt install apache2-utils"
+check_cmd git     "apt install git"
+# make は任意（install.sh 単体で進められるので必須にしない）
+soft_check_cmd make "apt install make (Makefile を使うなら推奨)"
 
 # docker compose は v2 サブコマンド
 if docker compose version >/dev/null 2>&1; then
