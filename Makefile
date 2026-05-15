@@ -49,8 +49,8 @@ uninstall-hermes: ## Hermes コンテナ内の Claude Code を撤去
 	sudo bash scripts/08-uninstall-hermes-claude.sh
 
 # ==== Claude Code 認証（対話・ブラウザ必須） ====
-oauth: ## forge ユーザーで `claude setup-token` を実行
-	sudo -iu $$(grep '^FORGE_USER=' .env | cut -d= -f2) claude setup-token
+oauth: ## Claude Code 認証の手順を表示（手動で行う）
+	@bash install.sh oauth
 
 # ==== 一括 ====
 # .env が無ければ env で作って開く → 以降は順に実行

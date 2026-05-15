@@ -41,8 +41,30 @@ step_cert()     { bash scripts/05-issue-cert.sh; }
 step_auth()     { bash scripts/06-setup-basic-auth.sh; }
 step_memory()   { bash scripts/07-start-memory.sh; }
 step_oauth() {
+  # KKS-Forge は Pro/Max サブスク前提なので、`claude setup-token` (長期 API トークン
+  # 発行) は使わない。CloudCLI を開いた状態で `claude /login` を回す方が安全
+  # （トークンが標準出力に出ない、~/.claude/credentials.json に保存される）。
   forge_user="$(grep '^FORGE_USER=' .env | cut -d= -f2)"
-  sudo -iu "$forge_user" claude setup-token
+  cat <<EOS
+
+==================================================================
+  Claude Code 認証は手動で行ってください（標準出力にトークンを残さないため）
+
+  方法 1: CloudCLI の UI で行う（推奨）
+    1. ブラウザで https://forge.kkshd.jp/ を開く
+    2. 新規セッションを作成して何か発言する
+    3. CloudCLI が認証プロンプトを案内するのでそれに従う
+
+  方法 2: forge ユーザーのシェルで対話ログイン
+    sudo -iu ${forge_user}
+    claude   # 起動後 /login を実行 → ブラウザで OAuth 承認
+    exit
+
+  ⚠ \`claude setup-token\` は使わないでください。
+     表示される長期トークンが履歴/ログに残ると漏洩リスクになります。
+     Pro/Max サブスクの場合は不要です。
+==================================================================
+EOS
 }
 step_verify() {
   # shellcheck disable=SC1091

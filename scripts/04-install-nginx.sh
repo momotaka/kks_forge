@@ -54,5 +54,12 @@ log "nginx -t で検証"
 if ! nginx -t; then
   die "Nginx 設定検証に失敗。$dst を見直してください。"
 fi
-systemctl reload nginx
-ok "Nginx 再読込完了"
+if systemctl is-active --quiet nginx; then
+  systemctl reload nginx
+  ok "Nginx 再読込完了"
+else
+  warn "nginx が停止中のため start を試みます"
+  systemctl start nginx
+  systemctl is-active --quiet nginx || die "nginx の起動に失敗: systemctl status nginx を確認してください"
+  ok "Nginx 起動完了"
+fi

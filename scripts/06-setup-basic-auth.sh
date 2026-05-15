@@ -26,5 +26,11 @@ fi
 chmod 0640 "$htpasswd_file"
 chown root:www-data "$htpasswd_file" 2>/dev/null || true
 
-systemctl reload nginx
-ok "Basic 認証設定完了"
+# nginx が起動していれば reload、停止中なら何もしない（起動時に自動で読まれる）
+if systemctl is-active --quiet nginx; then
+  systemctl reload nginx
+  ok "Basic 認証設定完了 (nginx reload 済み)"
+else
+  warn "nginx が停止中なので reload はスキップ（起動時に反映されます）"
+  ok "Basic 認証設定完了"
+fi
