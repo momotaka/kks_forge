@@ -1,4 +1,4 @@
-.PHONY: help env bootstrap check user claude cloudcli systemd nginx nginx-finalize cert auth memory install verify status logs uninstall-hermes oauth
+.PHONY: help env bootstrap check user claude cloudcli systemd firewall nginx nginx-finalize cert auth memory install verify status logs uninstall-hermes oauth
 
 SHELL := /bin/bash
 
@@ -28,6 +28,9 @@ cloudcli: ## CloudCLI を初回 npx 取得（systemd 起動前にキャッシュ
 systemd: ## systemd unit 配置 & 起動
 	sudo bash scripts/03-install-systemd.sh
 
+firewall: ## CloudCLI ポートを外部から ufw deny
+	sudo bash scripts/03b-firewall-lockdown.sh
+
 nginx: ## Nginx 設定 (証明書未取得なら HTTP-only、あれば HTTPS フル)
 	sudo bash scripts/04-install-nginx.sh
 
@@ -55,7 +58,7 @@ oauth: ## Claude Code 認証の手順を表示（手動で行う）
 # ==== 一括 ====
 # .env が無ければ env で作って開く → 以降は順に実行
 # auth (Basic 認証パスワード) と oauth (Claude Code) は対話が入る点だけ注意。
-install: env bootstrap check user claude cloudcli systemd nginx cert nginx-finalize auth memory oauth ## 全自動セットアップ (Phase 1〜3 + Claude Code OAuth)
+install: env bootstrap check user claude cloudcli systemd firewall nginx cert nginx-finalize auth memory oauth ## 全自動セットアップ (Phase 1〜3 + Claude Code OAuth)
 
 verify: ## 動作確認（HTTP/HTTPS 応答コードなど）
 	@source .env && \

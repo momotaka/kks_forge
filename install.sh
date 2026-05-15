@@ -36,6 +36,7 @@ step_user()     { bash scripts/01-create-user.sh; }
 step_claude()   { bash scripts/01b-install-claude-code.sh; }
 step_cloudcli() { bash scripts/02-install-cloudcli.sh; }
 step_systemd()  { bash scripts/03-install-systemd.sh; }
+step_firewall() { bash scripts/03b-firewall-lockdown.sh; }
 step_nginx()    { bash scripts/04-install-nginx.sh; }
 step_cert()     { bash scripts/05-issue-cert.sh; }
 step_auth()     { bash scripts/06-setup-basic-auth.sh; }
@@ -88,6 +89,7 @@ case "${1:-install}" in
     run "claude"         step_claude
     run "cloudcli"       step_cloudcli
     run "systemd"        step_systemd
+    run "firewall"       step_firewall  # CloudCLI ポートを外部から遮断
     run "nginx (http)"   step_nginx     # HTTP-only で立ち上げる
     run "cert"           step_cert      # webroot で証明書取得
     run "nginx (https)"  step_nginx     # 証明書を読み込んで HTTPS フル設定に差し替え
@@ -95,11 +97,11 @@ case "${1:-install}" in
     run "memory"         step_memory
     run "oauth"          step_oauth
     ;;
-  env|bootstrap|check|user|claude|cloudcli|systemd|nginx|cert|auth|memory|oauth|verify|status|logs)
+  env|bootstrap|check|user|claude|cloudcli|systemd|firewall|nginx|cert|auth|memory|oauth|verify|status|logs)
     "step_$1"
     ;;
   *)
-    echo "usage: $0 [install|env|bootstrap|check|user|claude|cloudcli|systemd|nginx|cert|auth|memory|oauth|verify|status|logs]" >&2
+    echo "usage: $0 [install|env|bootstrap|check|user|claude|cloudcli|systemd|firewall|nginx|cert|auth|memory|oauth|verify|status|logs]" >&2
     exit 2
     ;;
 esac

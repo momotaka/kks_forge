@@ -11,8 +11,11 @@ Group=${FORGE_USER}
 WorkingDirectory=${FORGE_HOME}
 Environment=NODE_ENV=production
 Environment=HOME=${FORGE_HOME}
+Environment=SERVER_PORT=${FORGE_PORT}
+# CloudCLI には --host 相当のフラグが無い。外部公開は Nginx + 既存ファイアウォール
+# (ufw 等) でブロックする方針。ローカルバインドだけにしたい場合は ufw deny ${FORGE_PORT} を併用。
 # npx を絶対パスで指定するとロケール差で事故るので、ログインシェル経由で起動
-ExecStart=/bin/bash -lc 'npx --yes ${FORGE_CLOUDCLI_PKG} --port ${FORGE_PORT} --host 127.0.0.1'
+ExecStart=/bin/bash -lc 'npx --yes ${FORGE_CLOUDCLI_PKG} --port ${FORGE_PORT}'
 Restart=always
 RestartSec=10
 # 標準出力は journal に流す（journalctl -u kks-forge で読める）
