@@ -24,16 +24,20 @@ cd /opt/kks-forge
 
 `install.sh` の中身（順番に実行されます）:
 
-1. `make env`      — `.env` を `.env.example` から作り、`$EDITOR` で開く。保存・終了で続行
-2. `make check`    — Node.js v22+ / docker / nginx / envsubst の前提確認
-3. `make user`     — `forge` ユーザー作成、`~/.claude` 配置
-4. `make cloudcli` — `@cloudcli-ai/cloudcli` を初回 npx 取得
-5. `make systemd`  — systemd unit を配置・自動起動
-6. `make nginx`    — Nginx 設定（SSL/Basic 認証/許可 IP）
-7. `make cert`     — Let's Encrypt 証明書取得
-8. `make auth`     — Basic 認証パスワード対話入力
-9. `make memory`   — mcp-memory-service を Docker で起動
-10. `make oauth`   — `claude setup-token` でブラウザ OAuth
+1. `env`       — `.env` を `.env.example` から作り、`$EDITOR` で開く。保存・終了で続行
+2. `bootstrap` — 不足する apt パッケージと Node.js v22+ を自動で導入
+3. `check`     — 依存が揃ったかの最終確認
+4. `user`      — `forge` ユーザー作成、`~/.claude` 配置
+5. `cloudcli`  — `@cloudcli-ai/cloudcli` を初回 npx 取得
+6. `systemd`   — systemd unit を配置・自動起動
+7. `nginx`     — Nginx 設定（SSL/Basic 認証/許可 IP）
+8. `cert`      — Let's Encrypt 証明書取得
+9. `auth`      — Basic 認証パスワード対話入力
+10. `memory`   — mcp-memory-service を Docker で起動
+11. `oauth`    — `claude setup-token` でブラウザ OAuth
+
+> bootstrap で勝手に apt install されるのを避けたい場合は
+> `FORGE_SKIP_BOOTSTRAP=1 ./install.sh` で実行してください。
 
 ### 仕組み上どうしても残る対話
 

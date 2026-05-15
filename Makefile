@@ -1,4 +1,4 @@
-.PHONY: help env check user cloudcli systemd nginx cert auth memory install verify status logs uninstall-hermes oauth
+.PHONY: help env bootstrap check user cloudcli systemd nginx cert auth memory install verify status logs uninstall-hermes oauth
 
 SHELL := /bin/bash
 
@@ -7,6 +7,9 @@ help: ## このヘルプを表示
 
 env: ## .env を準備しエディタで開く（保存後にインストールが続行）
 	@EDITOR="$$EDITOR" bash scripts/0-prepare-env.sh
+
+bootstrap: ## 不足する apt パッケージと Node.js v22+ を自動導入
+	sudo bash scripts/0-bootstrap-deps.sh
 
 # ==== Phase 1: 最小動作版 ====
 check: ## 前提条件チェック
@@ -46,7 +49,7 @@ oauth: ## forge ユーザーで `claude setup-token` を実行
 # ==== 一括 ====
 # .env が無ければ env で作って開く → 以降は順に実行
 # auth (Basic 認証パスワード) と oauth (Claude Code) は対話が入る点だけ注意。
-install: env check user cloudcli systemd nginx cert auth memory oauth ## 全自動セットアップ (Phase 1〜3 + Claude Code OAuth)
+install: env bootstrap check user cloudcli systemd nginx cert auth memory oauth ## 全自動セットアップ (Phase 1〜3 + Claude Code OAuth)
 
 verify: ## 動作確認（HTTP/HTTPS 応答コードなど）
 	@source .env && \

@@ -30,6 +30,7 @@ run() {
 }
 
 step_env()      { bash scripts/0-prepare-env.sh; }
+step_bootstrap(){ bash scripts/0-bootstrap-deps.sh; }
 step_check()    { bash scripts/00-prereq-check.sh; }
 step_user()     { bash scripts/01-create-user.sh; }
 step_cloudcli() { bash scripts/02-install-cloudcli.sh; }
@@ -57,22 +58,23 @@ step_logs()   { journalctl -u kks-forge.service -f; }
 
 case "${1:-install}" in
   install)
-    run "env"      step_env
-    run "check"    step_check
-    run "user"     step_user
-    run "cloudcli" step_cloudcli
-    run "systemd"  step_systemd
-    run "nginx"    step_nginx
-    run "cert"     step_cert
-    run "auth"     step_auth
-    run "memory"   step_memory
-    run "oauth"    step_oauth
+    run "env"       step_env
+    run "bootstrap" step_bootstrap
+    run "check"     step_check
+    run "user"      step_user
+    run "cloudcli"  step_cloudcli
+    run "systemd"   step_systemd
+    run "nginx"     step_nginx
+    run "cert"      step_cert
+    run "auth"      step_auth
+    run "memory"    step_memory
+    run "oauth"     step_oauth
     ;;
-  env|check|user|cloudcli|systemd|nginx|cert|auth|memory|oauth|verify|status|logs)
+  env|bootstrap|check|user|cloudcli|systemd|nginx|cert|auth|memory|oauth|verify|status|logs)
     "step_$1"
     ;;
   *)
-    echo "usage: $0 [install|env|check|user|cloudcli|systemd|nginx|cert|auth|memory|oauth|verify|status|logs]" >&2
+    echo "usage: $0 [install|env|bootstrap|check|user|cloudcli|systemd|nginx|cert|auth|memory|oauth|verify|status|logs]" >&2
     exit 2
     ;;
 esac
