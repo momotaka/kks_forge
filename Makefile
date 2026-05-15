@@ -1,4 +1,4 @@
-.PHONY: help env bootstrap check user cloudcli systemd nginx nginx-finalize cert auth memory install verify status logs uninstall-hermes oauth
+.PHONY: help env bootstrap check user claude cloudcli systemd nginx nginx-finalize cert auth memory install verify status logs uninstall-hermes oauth
 
 SHELL := /bin/bash
 
@@ -17,6 +17,9 @@ check: ## 前提条件チェック
 
 user: ## forge ユーザー作成
 	sudo bash scripts/01-create-user.sh
+
+claude: ## forge ユーザーに Claude Code 本体をインストール
+	sudo bash scripts/01b-install-claude-code.sh
 
 cloudcli: ## CloudCLI を初回 npx 取得（systemd 起動前にキャッシュ）
 	sudo bash scripts/02-install-cloudcli.sh
@@ -52,7 +55,7 @@ oauth: ## forge ユーザーで `claude setup-token` を実行
 # ==== 一括 ====
 # .env が無ければ env で作って開く → 以降は順に実行
 # auth (Basic 認証パスワード) と oauth (Claude Code) は対話が入る点だけ注意。
-install: env bootstrap check user cloudcli systemd nginx cert nginx-finalize auth memory oauth ## 全自動セットアップ (Phase 1〜3 + Claude Code OAuth)
+install: env bootstrap check user claude cloudcli systemd nginx cert nginx-finalize auth memory oauth ## 全自動セットアップ (Phase 1〜3 + Claude Code OAuth)
 
 verify: ## 動作確認（HTTP/HTTPS 応答コードなど）
 	@source .env && \

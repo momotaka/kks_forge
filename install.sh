@@ -33,6 +33,7 @@ step_env()      { bash scripts/0-prepare-env.sh; }
 step_bootstrap(){ bash scripts/0-bootstrap-deps.sh; }
 step_check()    { bash scripts/00-prereq-check.sh; }
 step_user()     { bash scripts/01-create-user.sh; }
+step_claude()   { bash scripts/01b-install-claude-code.sh; }
 step_cloudcli() { bash scripts/02-install-cloudcli.sh; }
 step_systemd()  { bash scripts/03-install-systemd.sh; }
 step_nginx()    { bash scripts/04-install-nginx.sh; }
@@ -62,6 +63,7 @@ case "${1:-install}" in
     run "bootstrap"      step_bootstrap
     run "check"          step_check
     run "user"           step_user
+    run "claude"         step_claude
     run "cloudcli"       step_cloudcli
     run "systemd"        step_systemd
     run "nginx (http)"   step_nginx     # HTTP-only で立ち上げる
@@ -71,11 +73,11 @@ case "${1:-install}" in
     run "memory"         step_memory
     run "oauth"          step_oauth
     ;;
-  env|bootstrap|check|user|cloudcli|systemd|nginx|cert|auth|memory|oauth|verify|status|logs)
+  env|bootstrap|check|user|claude|cloudcli|systemd|nginx|cert|auth|memory|oauth|verify|status|logs)
     "step_$1"
     ;;
   *)
-    echo "usage: $0 [install|env|bootstrap|check|user|cloudcli|systemd|nginx|cert|auth|memory|oauth|verify|status|logs]" >&2
+    echo "usage: $0 [install|env|bootstrap|check|user|claude|cloudcli|systemd|nginx|cert|auth|memory|oauth|verify|status|logs]" >&2
     exit 2
     ;;
 esac
