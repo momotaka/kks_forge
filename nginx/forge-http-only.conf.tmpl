@@ -1,0 +1,22 @@
+# KKS-Forge: 証明書取得前の HTTP-only 設定
+# - /.well-known/acme-challenge/ だけ受ける
+# - 他は「証明書取得中」を返す（リダイレクトしない: certbot のチャレンジを邪魔しないため）
+# 証明書取得後は forge-https.conf.tmpl に差し替えられる。
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ${FORGE_DOMAIN};
+
+    access_log ${FORGE_LOG_DIR}/nginx-access.log;
+    error_log  ${FORGE_LOG_DIR}/nginx-error.log warn;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location / {
+        return 503 "KKS-Forge: TLS 証明書取得中\n";
+        add_header Content-Type "text/plain; charset=utf-8" always;
+    }
+}

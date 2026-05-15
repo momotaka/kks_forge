@@ -58,17 +58,18 @@ step_logs()   { journalctl -u kks-forge.service -f; }
 
 case "${1:-install}" in
   install)
-    run "env"       step_env
-    run "bootstrap" step_bootstrap
-    run "check"     step_check
-    run "user"      step_user
-    run "cloudcli"  step_cloudcli
-    run "systemd"   step_systemd
-    run "nginx"     step_nginx
-    run "cert"      step_cert
-    run "auth"      step_auth
-    run "memory"    step_memory
-    run "oauth"     step_oauth
+    run "env"            step_env
+    run "bootstrap"      step_bootstrap
+    run "check"          step_check
+    run "user"           step_user
+    run "cloudcli"       step_cloudcli
+    run "systemd"        step_systemd
+    run "nginx (http)"   step_nginx     # HTTP-only で立ち上げる
+    run "cert"           step_cert      # webroot で証明書取得
+    run "nginx (https)"  step_nginx     # 証明書を読み込んで HTTPS フル設定に差し替え
+    run "auth"           step_auth
+    run "memory"         step_memory
+    run "oauth"          step_oauth
     ;;
   env|bootstrap|check|user|cloudcli|systemd|nginx|cert|auth|memory|oauth|verify|status|logs)
     "step_$1"

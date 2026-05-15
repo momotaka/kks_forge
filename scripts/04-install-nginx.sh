@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Nginx 設定を配置する。
-# - sites-available/forge.conf を生成 → sites-enabled に symlink
-# - snippets/kks-forge-allow.conf に allow/deny を書く
+# Nginx 設定を配置する（2 段階運用）。
+# - 証明書がまだ無い場合は HTTP-only テンプレを置いて nginx を起動できる状態にする
+# - 証明書取得後にもう一度このスクリプトを呼ぶと、HTTPS フル設定に差し替えられる
 # - 既存設定を壊さないため nginx -t で検証してから reload
 
 set -euo pipefail
@@ -12,7 +12,14 @@ load_env
 
 require_cmd nginx
 
-src="${KKS_FORGE_ROOT}/nginx/forge.conf.tmpl"
+cert_path="/etc/letsencrypt/live/${FORGE_DOMAIN}/fullchain.pem"
+if [[ -f "$cert_path" ]]; then
+  src="${KKS_FORGE_ROOT}/nginx/forge-https.conf.tmpl"
+  log "証明書を検出 → HTTPS フル設定で生成"
+else
+  src="${KKS_FORGE_ROOT}/nginx/forge-http-only.conf.tmpl"
+  warn "証明書未取得 → HTTP-only 設定で生成（certbot 用）"
+fi
 dst="/etc/nginx/sites-available/${FORGE_DOMAIN}.conf"
 link="/etc/nginx/sites-enabled/${FORGE_DOMAIN}.conf"
 allow_snippet="/etc/nginx/snippets/kks-forge-allow.conf"
