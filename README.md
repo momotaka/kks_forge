@@ -10,30 +10,38 @@ CloudCLI（旧 Claude Code UI）を VPS 上で動かし、Nginx 経由で
 
 ## クイックスタート
 
-VPS 上で root として：
+VPS 上で root として、これだけ：
 
 ```bash
 git clone https://github.com/momotaka/kks_forge.git /opt/kks-forge
 cd /opt/kks-forge
-cp .env.example .env
-$EDITOR .env                  # FORGE_DOMAIN / FORGE_LE_EMAIL などを設定
-
-make help                     # ターゲット一覧
-make install                  # Phase 1〜3 を一括実行
-sudo -iu forge claude setup-token   # Claude Code OAuth
+make install                  # ← .env がエディタで開く → 順に全部走る
 make verify
 ```
 
 `make install` の中身（順番に実行されます）:
 
-1. `make check`    — Node.js v22+ / docker / nginx / envsubst の前提確認
-2. `make user`     — `forge` ユーザー作成、`~/.claude` 配置
-3. `make cloudcli` — `@cloudcli-ai/cloudcli` を初回 npx 取得
-4. `make systemd`  — systemd unit を配置・自動起動
-5. `make nginx`    — Nginx 設定（SSL/Basic 認証/許可 IP）
-6. `make cert`     — Let's Encrypt 証明書取得
-7. `make auth`     — Basic 認証パスワード対話入力
-8. `make memory`   — mcp-memory-service を Docker で起動
+1. `make env`      — `.env` を `.env.example` から作り、`$EDITOR` で開く。保存・終了で続行
+2. `make check`    — Node.js v22+ / docker / nginx / envsubst の前提確認
+3. `make user`     — `forge` ユーザー作成、`~/.claude` 配置
+4. `make cloudcli` — `@cloudcli-ai/cloudcli` を初回 npx 取得
+5. `make systemd`  — systemd unit を配置・自動起動
+6. `make nginx`    — Nginx 設定（SSL/Basic 認証/許可 IP）
+7. `make cert`     — Let's Encrypt 証明書取得
+8. `make auth`     — Basic 認証パスワード対話入力
+9. `make memory`   — mcp-memory-service を Docker で起動
+10. `make oauth`   — `claude setup-token` でブラウザ OAuth
+
+### 仕組み上どうしても残る対話
+
+完全無人にはできません。次の3点だけは人の手が要ります：
+
+- **`.env` 編集**（エディタが立ち上がります。`FORGE_DOMAIN` と `FORGE_LE_EMAIL` だけは要確認）
+- **Basic 認証パスワード**（`htpasswd` が対話入力。履歴に残さないため意図的）
+- **Claude Code OAuth**（`claude setup-token` の URL をブラウザで承認）
+
+DNS A レコード（`forge.kkshd.jp` → VPS）は **`make install` 前に**切っておいてください。
+未設定だと `make cert`（Let's Encrypt）で失敗します。
 
 任意：
 

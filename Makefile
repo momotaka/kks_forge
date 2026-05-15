@@ -1,12 +1,12 @@
-.PHONY: help env check user cloudcli systemd nginx cert auth memory install verify status logs uninstall-hermes
+.PHONY: help env check user cloudcli systemd nginx cert auth memory install verify status logs uninstall-hermes oauth
 
 SHELL := /bin/bash
 
 help: ## このヘルプを表示
 	@awk 'BEGIN {FS=":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-env: ## .env を .env.example から作る（既にあればスキップ）
-	@if [ -f .env ]; then echo ".env は既にあります"; else cp .env.example .env && echo ".env を作りました。編集してください。"; fi
+env: ## .env を準備しエディタで開く（保存後にインストールが続行）
+	@EDITOR="$$EDITOR" bash scripts/0-prepare-env.sh
 
 # ==== Phase 1: 最小動作版 ====
 check: ## 前提条件チェック
@@ -39,8 +39,14 @@ memory: ## mcp-memory-service を Docker で起動
 uninstall-hermes: ## Hermes コンテナ内の Claude Code を撤去
 	sudo bash scripts/08-uninstall-hermes-claude.sh
 
+# ==== Claude Code 認証（対話・ブラウザ必須） ====
+oauth: ## forge ユーザーで `claude setup-token` を実行
+	sudo -iu $$(grep '^FORGE_USER=' .env | cut -d= -f2) claude setup-token
+
 # ==== 一括 ====
-install: check user cloudcli systemd nginx cert auth memory ## Phase 1〜3 を一括実行
+# .env が無ければ env で作って開く → 以降は順に実行
+# auth (Basic 認証パスワード) と oauth (Claude Code) は対話が入る点だけ注意。
+install: env check user cloudcli systemd nginx cert auth memory oauth ## 全自動セットアップ (Phase 1〜3 + Claude Code OAuth)
 
 verify: ## 動作確認（HTTP/HTTPS 応答コードなど）
 	@source .env && \

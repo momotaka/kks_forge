@@ -7,12 +7,23 @@
 # 例: /opt/kks-forge にクローン（root で）
 sudo git clone https://github.com/momotaka/kks_forge.git /opt/kks-forge
 cd /opt/kks-forge
-sudo cp .env.example .env
-sudo $EDITOR .env          # FORGE_DOMAIN, FORGE_LE_EMAIL などを編集
+sudo make install        # .env がエディタで開く → 保存 → 残りが全部走る
 ```
 
 > 全ての `make ...` ターゲットは内部で `sudo bash scripts/...` を呼びます。
 > `make help` で一覧、`make verify` で動作確認、`make logs` で journalctl 追従。
+
+## 仕組み上の対話ポイント
+
+`make install` は最大限自動化していますが、次の3つだけ人の手が要ります：
+
+| 対話 | タイミング | 内容 |
+|---|---|---|
+| `.env` 編集 | `make env` で `$EDITOR` が立ち上がる | `FORGE_DOMAIN` / `FORGE_LE_EMAIL` などを確認 |
+| Basic 認証パスワード | `make auth` で `htpasswd` が訊いてくる | 履歴/ログに残さないため意図的に対話 |
+| Claude Code OAuth | `make oauth` 末尾 | 表示された URL をブラウザで承認 |
+
+加えて **DNS** A レコード (`forge.kkshd.jp` → VPS) は `make install` 前に外部で設定が必要です（未設定だと `make cert` が失敗）。
 
 ---
 
@@ -21,17 +32,18 @@ sudo $EDITOR .env          # FORGE_DOMAIN, FORGE_LE_EMAIL などを編集
 ゴール: 「ブラウザで CloudCLI が開く、プロジェクト一覧が見える」
 
 ```bash
+make env         # .env がエディタで開く（保存・終了で続行）
 make check       # Node.js v22+ / docker / nginx / envsubst などの存在チェック
 make user        # forge ユーザーと ~/.claude を作成
 make cloudcli    # @cloudcli-ai/cloudcli を初回 npx 取得
 ```
 
-ここまでで Claude Code 自体は未認証。次のコマンドを **手動** で実行して OAuth を済ませる：
+Claude Code 自体の OAuth は `make install` の中で `make oauth` として実行されます。
+個別に Phase 1 だけ進めた場合は次で済ませます：
 
 ```bash
-sudo -iu forge
-# forge シェルの中で
-claude setup-token   # 表示された URL をブラウザで開いて承認
+make oauth
+# = sudo -iu forge claude setup-token   # 表示された URL をブラウザで承認
 ```
 
 SSH ポートフォワード経由で UI を覗くなら：
