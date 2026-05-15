@@ -1,0 +1,16 @@
+.env
+*.local
+*.swp
+*.bak
+node_modules/
+.DS_Store
+
+# 生成物（テンプレを envsubst でレンダリングした結果）
+build/
+out/
+
+# 認証情報（誤コミット防止）
+*.htpasswd
+*.pem
+*.key
+secrets/

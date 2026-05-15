@@ -1,0 +1,38 @@
+{
+  "_comment": "~/.claude/settings.json の hooks 部分にマージしてください。FORGE_REPO はクローン先パスに置き換え。",
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/kks-forge/plugins/telegram-notify/notify.sh Stop"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/kks-forge/plugins/telegram-notify/notify.sh SubagentStop"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/kks-forge/plugins/telegram-notify/notify.sh Notification"
+          }
+        ]
+      }
+    ]
+  }
+}

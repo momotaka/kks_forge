@@ -1,0 +1,30 @@
+[Unit]
+Description=KKS-Forge (CloudCLI) - Claude Code Web UI
+Documentation=https://cloudcli.ai/docs
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=${FORGE_USER}
+Group=${FORGE_USER}
+WorkingDirectory=${FORGE_HOME}
+Environment=NODE_ENV=production
+Environment=HOME=${FORGE_HOME}
+# npx を絶対パスで指定するとロケール差で事故るので、ログインシェル経由で起動
+ExecStart=/bin/bash -lc 'npx --yes ${FORGE_CLOUDCLI_PKG} --port ${FORGE_PORT} --host 127.0.0.1'
+Restart=always
+RestartSec=10
+# 標準出力は journal に流す（journalctl -u kks-forge で読める）
+StandardOutput=journal
+StandardError=journal
+
+# サンドボックス強化（壊れた拡張等から OS を守る）
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=false
+ReadWritePaths=${FORGE_HOME} ${FORGE_LOG_DIR}
+
+[Install]
+WantedBy=multi-user.target

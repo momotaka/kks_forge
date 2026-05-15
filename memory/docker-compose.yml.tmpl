@@ -1,0 +1,17 @@
+# mcp-memory-service を host ネットワークで起動する。
+# - 永続データは ${FORGE_MEMORY_DATA_DIR} にバインド
+# - host モードなので公開ポートはイメージの既定値（mcp-memory-service の README 参照）
+# - CloudCLI 側の MCP 管理から `http://127.0.0.1:<port>` で登録する
+
+services:
+  memory:
+    image: ${FORGE_MEMORY_IMAGE}
+    container_name: kks-forge-memory
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ${FORGE_MEMORY_DATA_DIR}:/data
+    environment:
+      - MCP_MEMORY_STORAGE_PATH=/data
+      - MCP_MEMORY_CHROMA_PATH=/data/chroma
+      - MCP_MEMORY_SQLITE_PATH=/data/memory.sqlite
