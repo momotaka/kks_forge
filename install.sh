@@ -93,7 +93,8 @@ case "${1:-install}" in
     run "nginx (http)"   step_nginx     # HTTP-only で立ち上げる
     run "cert"           step_cert      # webroot で証明書取得
     run "nginx (https)"  step_nginx     # 証明書を読み込んで HTTPS フル設定に差し替え
-    run "auth"           step_auth
+    # Basic 認証は CloudCLI (SPA/SW/WS) と非互換のためチェーンから除外。
+    # 必要な場合のみ手動で `./install.sh auth` を叩く（forge-https.conf.tmpl の auth_basic 行を有効化してから）。
     run "memory"         step_memory
     run "oauth"          step_oauth
     ;;

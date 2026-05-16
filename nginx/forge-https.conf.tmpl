@@ -1,8 +1,12 @@
 # KKS-Forge リバースプロキシ設定
 # - SSL 終端
-# - Basic 認証（/etc/nginx/.htpasswd-forge）
 # - 許可 IP 制限（scripts/04-install-nginx.sh が「include」用ファイルを生成）
 # - WebSocket 透過（CloudCLI はターミナル/チャットで WS を使う）
+#
+# Basic 認証は CloudCLI (SPA + Service Worker + WebSocket) と相性が悪く、
+# Service Worker や fetch から認証ヘッダーが漏れて再認証ループを起こす。
+# 必要な場合は下の auth_basic 行のコメントを外して `make auth` で htpasswd を作る。
+# 通常は CloudCLI 自身のログイン認証 + HTTPS + ufw による :3300 遮断で十分。
 
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -37,9 +41,10 @@ server {
     # IP 制限（scripts/04 が空ファイル or allow リストを生成）
     include /etc/nginx/snippets/kks-forge-allow.conf;
 
-    # Basic 認証
-    auth_basic "KKS-Forge";
-    auth_basic_user_file /etc/nginx/.htpasswd-forge;
+    # Basic 認証はデフォルト無効（CloudCLI と非互換のため。詳細は冒頭コメント）
+    # 有効化したい場合は次の 2 行のコメントを外す:
+    # auth_basic "KKS-Forge";
+    # auth_basic_user_file /etc/nginx/.htpasswd-forge;
 
     # アップロード／長時間レスポンスを許容
     client_max_body_size 50m;

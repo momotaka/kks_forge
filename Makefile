@@ -40,7 +40,9 @@ nginx-finalize: ## 証明書取得後に HTTPS フル設定へ差し替え (inst
 cert: ## Let's Encrypt 証明書取得
 	sudo bash scripts/05-issue-cert.sh
 
-auth: ## Basic 認証パスワード設定
+auth: ## Basic 認証パスワード設定（オプション。CloudCLI と非互換のためデフォルト無効）
+	@echo "⚠ Basic 認証は CloudCLI (SPA/SW/WS) と相性が悪く、再認証ループの原因になります。"
+	@echo "  有効化する場合は forge-https.conf.tmpl の auth_basic 2 行のコメントを外してから再度 nginx を当ててください。"
 	sudo bash scripts/06-setup-basic-auth.sh
 
 # ==== Phase 3: 記憶統合 ====
@@ -57,8 +59,9 @@ oauth: ## Claude Code 認証の手順を表示（手動で行う）
 
 # ==== 一括 ====
 # .env が無ければ env で作って開く → 以降は順に実行
-# auth (Basic 認証パスワード) と oauth (Claude Code) は対話が入る点だけ注意。
-install: env bootstrap check user claude cloudcli systemd firewall nginx cert nginx-finalize auth memory oauth ## 全自動セットアップ (Phase 1〜3 + Claude Code OAuth)
+# auth は CloudCLI と非互換のためインストールチェーンから除外。必要なら個別に `make auth` を叩く。
+# oauth (Claude Code) は対話が入る点だけ注意。
+install: env bootstrap check user claude cloudcli systemd firewall nginx cert nginx-finalize memory oauth ## 全自動セットアップ (Phase 1〜3 + Claude Code OAuth)
 
 verify: ## 動作確認（HTTP/HTTPS 応答コードなど）
 	@source .env && \
